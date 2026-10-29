@@ -69,12 +69,12 @@ export function LoadingPanel({ label = "Generating…" }: { label?: string }) {
 
 function copyText(text: string): Promise<void> {
   if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-    return navigator.clipboard.writeText(text).catch(async () => fallbackCopy(text));
+    return navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
   }
   return fallbackCopy(text);
 }
 
-function fallbackCopy(text: string): void {
+async function fallbackCopy(text: string): Promise<void> {
   if (typeof document === "undefined") return;
   const area = document.createElement("textarea");
   area.value = text;

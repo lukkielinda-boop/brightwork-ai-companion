@@ -7,12 +7,15 @@ import { z } from "zod/v4";
 
 import { toolIds, toolInputSchemas, type ToolId } from "@/lib/ai/schemas";
 
+type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+
 export type GenerateResult =
-  | { ok: true; output: unknown }
+  | { ok: true; output: JsonValue }
   | { ok: false; error: string };
 
-export const generateAiOutput = createServerFn({ method: "POST" }).handler(
-  async ({ data }: { data: unknown }): Promise<GenerateResult> => {
+export const generateAiOutput = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) => input)
+  .handler(async ({ data }: { data: unknown }): Promise<GenerateResult> => {
     const requestSchema = z.object({ tool: z.enum(toolIds), input: z.unknown() });
     const request = requestSchema.safeParse(data);
     if (!request.success) {

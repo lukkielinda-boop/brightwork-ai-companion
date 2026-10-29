@@ -34,12 +34,12 @@ function toStrictWireSchema(schema: ZodType): Record<string, unknown> {
     override: (ctx) => {
       const node = ctx.jsonSchema as Record<string, unknown> | null;
       if (node && typeof node === "object") {
-        if (node.type === "object") node.additionalProperties = false;
-        delete node.$schema;
+        if (node["type"] === "object") node["additionalProperties"] = false;
+        delete node["$schema"];
       }
     },
   }) as Record<string, unknown>;
-  delete wire.$schema;
+  delete wire["$schema"];
   return wire;
 }
 

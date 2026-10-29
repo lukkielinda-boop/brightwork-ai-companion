@@ -18,7 +18,7 @@ export class AiToolError extends Error {
 
 function formatGatewayError(error: unknown): AiToolError {
   if (error instanceof APICallError) {
-    const status = error.statusCode;
+    const status = error.statusCode ?? 0;
     let upstreamMessage = error.message;
     try {
       const body = JSON.parse(error.responseBody ?? "{}") as { message?: unknown; error?: { message?: unknown } };
@@ -63,7 +63,7 @@ export async function generateStructuredOutput<T>(args: {
   wireSchema: unknown;
   parse: (value: unknown) => T;
 }): Promise<T> {
-  const apiKey = process.env.LOVABLE_API_KEY;
+  const apiKey = process.env["LOVABLE_API_KEY"];
   if (!apiKey) {
     throw new AiToolError(
       "AI is not configured in this environment. An administrator needs to set the LOVABLE_API_KEY server secret.",
@@ -74,7 +74,6 @@ export async function generateStructuredOutput<T>(args: {
   const provider = createOpenAI({
     baseURL: GATEWAY_URL,
     apiKey,
-    strictJsonSchema: true,
     headers: { "Lovable-API-Key": apiKey, "X-Lovable-AIG-SDK": "vercel-ai-sdk" },
     fetch: runIdFetch.fetch,
   });
@@ -96,6 +95,7 @@ export async function generateStructuredOutput<T>(args: {
           forceReasoning: true,
           reasoningEffort: "medium",
           reasoningSummary: "auto",
+          strictJsonSchema: true,
           include: ["reasoning.encrypted_content"],
         },
       },
