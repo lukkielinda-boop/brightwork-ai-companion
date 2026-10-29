@@ -41,5 +41,12 @@ export function useAiTool<TOutput>(tool: ToolId) {
     setOutput(null);
   }, []);
 
-  return { status, error, output, run, reset, isLoading: status === "loading" };
+  // Used by save/reopen workflows to display a saved draft without regenerating.
+  const load = useCallback((value: TOutput) => {
+    setOutput(value);
+    setStatus("done");
+    setError(null);
+  }, []);
+
+  return { status, error, output, run, reset, load, isLoading: status === "loading" };
 }
