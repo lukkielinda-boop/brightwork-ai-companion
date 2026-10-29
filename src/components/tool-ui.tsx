@@ -181,7 +181,7 @@ export function SavedDraftsPanel({
   getPreview: (draft: SavedDraft) => string;
   onLoad: (draft: SavedDraft) => void;
 }) {
-  const { drafts, refresh } = useSavedDrafts(kind);
+  const { drafts, refresh, remove } = useSavedDrafts(kind);
   const [confirmingId, setConfirmingId] = useState<string | null>(null);
 
   if (drafts.length === 0) {
@@ -209,8 +209,7 @@ export function SavedDraftsPanel({
                 size="sm"
                 variant="destructive"
                 onClick={() => {
-                  // Re-delete through the lib to keep the list source of truth simple.
-                  deleteSavedDraft(draft.id);
+                  remove(draft.id);
                   setConfirmingId(null);
                   refresh();
                 }}
