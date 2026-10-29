@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSavedDrafts } from "@/hooks/use-saved-drafts";
-import { deleteSavedDraft, type SavedDraft } from "@/lib/saved-drafts";
+import type { SavedDraft } from "@/lib/saved-drafts";
 import { cn } from "@/lib/utils";
 
 export function ToolPage({
@@ -152,17 +152,14 @@ export function RegenerateButton({ onClick, disabled }: { onClick: () => void; d
   );
 }
 
-export function DeleteDraftButton({ id, onDone }: { id: string; onDone?: () => void }) {
+export function DeleteDraftButton({ onConfirmPrompt }: { onConfirmPrompt: () => void }) {
   return (
     <Button
       variant="ghost"
       size="sm"
       className="text-muted-foreground hover:text-destructive"
       aria-label="Delete saved draft"
-      onClick={() => {
-        deleteSavedDraft(id);
-        onDone?.();
-      }}
+      onClick={onConfirmPrompt}
     >
       <Trash2 />
     </Button>
@@ -229,7 +226,7 @@ export function SavedDraftsPanel({
               <Button size="sm" variant="outline" onClick={() => onLoad(draft)}>
                 Reopen
               </Button>
-              <DeleteDraftButton id={draft.id} onDone={() => setConfirmingId(draft.id)} />
+              <DeleteDraftButton onConfirmPrompt={() => setConfirmingId(draft.id)} />
             </div>
           )}
         </li>
