@@ -32,7 +32,7 @@ export const generateAiOutput = createServerFn({ method: "POST" })
     try {
       const { runTool } = await import("./registry");
       const output = await runTool(tool, parsedInput.data);
-      return { ok: true, output };
+      return { ok: true, output: output as JsonValue };
     } catch (error) {
       const message = error instanceof Error && error.message ? error.message : "Generation failed. Please try again.";
       return { ok: false, error: message };
