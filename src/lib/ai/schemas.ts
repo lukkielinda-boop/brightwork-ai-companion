@@ -83,6 +83,10 @@ export const plannerInputSchema = z.object({
   availableHoursPerDay: z.string().trim().max(100).nullable(),
   commitments: z.string().trim().max(3000, "Existing commitments must be under 3,000 characters.").nullable(),
   scope: z.enum(plannerScopes),
+  // Replanning: what changed in the user's day, plus the current plan to rebuild from.
+  scheduleChanges: z.string().trim().max(3000, "Schedule changes must be under 3,000 characters.").nullable().default(null),
+  currentPlan: z.string().trim().max(15000).nullable().default(null),
+  currentTime: z.string().trim().max(40).nullable().default(null),
 });
 export type PlannerInput = z.infer<typeof plannerInputSchema>;
 export const plannerOutputSchema = z.object({

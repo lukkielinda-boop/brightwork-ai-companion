@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarCheck, Loader2 } from "lucide-react";
+import { CalendarCheck, Loader2, RefreshCw } from "lucide-react";
 
 import { ResponsibleAiBanner } from "@/components/responsible-ai-banner";
 import { AiErrorAlert, CopyButton, DownloadButton, LoadingPanel, RegenerateButton, ToolPage } from "@/components/tool-ui";
@@ -77,6 +77,39 @@ export function TaskPlannerTool() {
     setFormError(null);
     const result = await run(parsed.data as PlannerInput);
     if (result) recordActivity("planner", parsed.data.tasks.slice(0, 60), result.summary);
+  };
+
+  const [changes, setChanges] = useState("");
+  const [replanError, setReplanError] = useState<string | null>(null);
+
+  const handleReplan = async () => {
+    if (!output) return;
+    if (!changes.trim()) {
+      setReplanError("Describe what changed in your schedule first.");
+      return;
+    }
+    const now = new Date();
+    const parsed = plannerInputSchema.safeParse({
+      tasks,
+      scope: "daily",
+      workdayStart: workdayStart.trim() || null,
+      workdayEnd: workdayEnd.trim() || null,
+      availableHoursPerDay: availableHours.trim() || null,
+      commitments: commitments.trim() || null,
+      scheduleChanges: changes.trim(),
+      currentPlan: plannerToMarkdown(output),
+      currentTime: `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`,
+    });
+    if (!parsed.success) {
+      setReplanError(parsed.error.issues[0]?.message ?? "Please check your inputs.");
+      return;
+    }
+    setReplanError(null);
+    const result = await run(parsed.data as PlannerInput);
+    if (result) {
+      recordActivity("planner", `Replanned: ${changes.trim().slice(0, 50)}`, result.summary);
+      setChanges("");
+    }
   };
 
   const handleClear = () => {
@@ -270,6 +303,38 @@ export function TaskPlannerTool() {
               <DownloadButton filename={`task-plan-${Date.now()}.md`} content={plannerToMarkdown(output)} label="Export schedule" />
               <RegenerateButton onClick={handleGenerate} />
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {generated && output && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <RefreshCw className="size-4" /> Schedule changed?
+            </CardTitle>
+            <CardDescription>
+              Describe what changed today and the AI will reprioritize your tasks and rebuild today's plan.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Textarea
+              aria-label="Schedule changes"
+              value={changes}
+              onChange={(e) => setChanges(e.target.value)}
+              placeholder={"e.g. A client call was added 14:00–15:00, my 11:00 meeting was cancelled, and the report is now due today."}
+              rows={3}
+              maxLength={3000}
+            />
+            {replanError && (
+              <p className="text-sm text-destructive" role="alert">
+                {replanError}
+              </p>
+            )}
+            <Button onClick={handleReplan} disabled={isLoading}>
+              {isLoading ? <Loader2 className="animate-spin" /> : <RefreshCw />}
+              {isLoading ? "Rebuilding…" : "Rebuild today's plan"}
+            </Button>
           </CardContent>
         </Card>
       )}
