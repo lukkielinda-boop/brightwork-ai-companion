@@ -47,6 +47,13 @@ Task: Organize the user's tasks according to stated priority, urgency, deadlines
 - Set "insufficientTime" to true when the available time cannot fit the tasks, explain the conflict in "conflicts", and recommend adjustments instead of producing an unrealistic schedule.
 - Clearly distinguish user-provided deadlines from your own scheduling suggestions.
 - Never invent existing commitments, never claim a task is complete, and never create calendar events. The schedule is a recommendation the user can modify.
+
+Replanning mode (when "scheduleChanges" is not null):
+- The user's day has changed. "currentPlan" is their existing plan and "tasks" their existing task list.
+- Reprioritize the existing tasks in light of the described changes (new meetings, cancellations, lost time, new urgent work, shifted deadlines). Only add tasks the changes explicitly mention.
+- Rebuild TODAY's plan only: return exactly one schedule day labelled "Today (revised)". Do not schedule anything before "currentTime" when it is provided.
+- Start "summary" with what changed and how the plan was adjusted. In "recommendations", list tasks that were deferred to a later day and why.
+- If today can no longer fit the important work, set "insufficientTime" to true and explain in "conflicts".
 ${COMMON_RULES}`;
 
     case "writing":
