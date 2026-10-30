@@ -67,7 +67,16 @@ export const meetingOutputSchema = z.object({
   executiveSummary: z.string(),
   discussionPoints: z.array(z.string()),
   decisions: z.array(z.object({ decision: z.string(), context: z.string().nullable() })),
-  actionItems: z.array(z.object({ task: z.string(), owner: z.string().nullable(), deadline: z.string().nullable() })),
+  actionItems: z.array(
+    z.object({
+      task: z.string(),
+      owner: z.string().nullable(),
+      deadline: z.string().nullable(),
+      deadlineSource: z.enum(["explicit", "suggested"]),
+      priority: z.enum(["high", "medium", "low"]),
+      rationale: z.string(),
+    }),
+  ),
   outstandingQuestions: z.array(z.string()),
   followUpTopics: z.array(z.string()),
   caveats: z.array(z.string()),
