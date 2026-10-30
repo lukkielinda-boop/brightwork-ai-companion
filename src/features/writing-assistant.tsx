@@ -39,7 +39,7 @@ export function WritingAssistantTool() {
   const { save, drafts, refresh } = useSavedDrafts("writing");
 
   const [text, setText] = useState("");
-  const [action, setAction] = useState<string>("professional-rewrite");
+  const [action, setAction] = useState<WritingAction>("professional-rewrite");
   const [tone, setTone] = useState<string>("none");
   const [formError, setFormError] = useState<string | null>(null);
   const [editedResult, setEditedResult] = useState("");
