@@ -22,7 +22,9 @@ import { recordActivity } from "@/lib/activity";
 import { writingInputSchema, writingActions, writingTones, type WritingInput, type WritingOutput } from "@/lib/ai/schemas";
 import type { SavedDraft } from "@/lib/saved-drafts";
 
-const ACTION_LABELS: Record<(typeof writingActions)[number], string> = {
+type WritingAction = (typeof writingActions)[number];
+
+const ACTION_LABELS: Record<WritingAction, string> = {
   "professional-rewrite": "Rewrite professionally",
   "grammar-spelling": "Fix grammar & spelling",
   simplify: "Simplify",
@@ -37,7 +39,7 @@ export function WritingAssistantTool() {
   const { save, drafts, refresh } = useSavedDrafts("writing");
 
   const [text, setText] = useState("");
-  const [action, setAction] = useState<string>("professional-rewrite");
+  const [action, setAction] = useState<WritingAction>("professional-rewrite");
   const [tone, setTone] = useState<string>("none");
   const [formError, setFormError] = useState<string | null>(null);
   const [editedResult, setEditedResult] = useState("");
@@ -111,7 +113,7 @@ export function WritingAssistantTool() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="writing-action">Writing action</Label>
-              <Select value={action} onValueChange={setAction}>
+              <Select value={action} onValueChange={(v) => setAction(v as WritingAction)}>
                 <SelectTrigger id="writing-action" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
