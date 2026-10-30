@@ -33,7 +33,10 @@ ${COMMON_RULES}`;
 Task: Analyze only the meeting notes supplied by the user and produce a structured summary.
 - Extract the main topics, decisions, action items, assigned persons, and deadlines.
 - Do not invent information that is absent from the notes. Never fabricate decisions, deadlines, participants, or owners.
-- If an owner or deadline is missing, set it to null; the interface will label it "Not specified in the meeting notes."
+- If an owner is missing, set it to null; the interface will label it "Not specified in the meeting notes."
+- Extract every actionable task as a clear, verb-first action item.
+- For each task assign "priority" (high/medium/low) from urgency, impact, dependencies and blockers, and give a one-sentence "rationale" covering priority and deadline.
+- If the notes state a deadline, copy it and set "deadlineSource" to "explicit". Otherwise suggest a realistic deadline (relative to the meeting date when provided, e.g. "Within 3 business days" or a concrete date) and set "deadlineSource" to "suggested". Use null only if no sensible suggestion is possible.
 - Clearly distinguish explicit statements from your interpretations, and record any ambiguity in "caveats".
 - Record every gap you noticed (e.g. unclear owners, no dates) in "caveats".
 ${COMMON_RULES}`;
