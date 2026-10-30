@@ -14,6 +14,25 @@ import { meetingInputSchema, type MeetingInput, type MeetingOutput } from "@/lib
 
 const NOT_SPECIFIED = "Not specified in the meeting notes.";
 
+type ActionItem = MeetingOutput["actionItems"][number];
+const PRIORITY_ORDER = { high: 0, medium: 1, low: 2 } as const;
+const PRIORITY_STYLES = {
+  high: "bg-destructive/10 text-destructive",
+  medium: "bg-secondary text-secondary-foreground",
+  low: "bg-muted text-muted-foreground",
+} as const;
+
+export function sortTasks(items: ActionItem[]): ActionItem[] {
+  return [...items].sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
+}
+
+export function taskLine(a: ActionItem): string {
+  const deadline = a.deadline
+    ? `${a.deadline} (${a.deadlineSource === "explicit" ? "from notes" : "AI suggested"})`
+    : NOT_SPECIFIED;
+  return `- [${a.priority.toUpperCase()}] ${a.task} — Owner: ${a.owner ?? NOT_SPECIFIED}; Deadline: ${deadline}`;
+}
+
 export function meetingToMarkdown(output: MeetingOutput, title: string): string {
   const lines: string[] = [`# Meeting summary — ${title}`, "", "## Executive summary", output.executiveSummary, ""];
   if (output.discussionPoints.length) {
@@ -25,11 +44,7 @@ export function meetingToMarkdown(output: MeetingOutput, title: string): string 
     lines.push("");
   }
   if (output.actionItems.length) {
-    lines.push("## Action items");
-    for (const a of output.actionItems) {
-      lines.push(`- ${a.task} — Owner: ${a.owner ?? NOT_SPECIFIED}; Deadline: ${a.deadline ?? NOT_SPECIFIED}`);
-    }
-    lines.push("");
+    lines.push("## Actionable tasks", ...sortTasks(output.actionItems).map(taskLine), "");
   }
   if (output.outstandingQuestions.length) {
     lines.push("## Outstanding questions", ...output.outstandingQuestions.map((q) => `- ${q}`), "");
@@ -192,12 +207,26 @@ export function MeetingSummarizerTool() {
 
             {output.actionItems.length > 0 && (
               <section>
-                <h3 className="mb-1 text-sm font-semibold">Action items</h3>
-                <ul className="space-y-1 text-sm text-muted-foreground">
-                  {output.actionItems.map((a, i) => (
-                    <li key={i}>
-                      <span className="font-medium text-foreground">{a.task}</span> — Owner:{" "}
-                      {a.owner ?? NOT_SPECIFIED} · Deadline: {a.deadline ?? NOT_SPECIFIED}
+                <h3 className="mb-2 text-sm font-semibold">Actionable tasks</h3>
+                <ul className="space-y-2">
+                  {sortTasks(output.actionItems).map((a, i) => (
+                    <li key={i} className="rounded-lg border bg-card px-3 py-2 text-sm">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge className={PRIORITY_STYLES[a.priority]}>{a.priority}</Badge>
+                        <span className="font-medium text-foreground">{a.task}</span>
+                      </div>
+                      <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                        <span>Owner: {a.owner ?? NOT_SPECIFIED}</span>
+                        <span>
+                          Deadline: {a.deadline ?? NOT_SPECIFIED}
+                          {a.deadline && (
+                            <Badge variant="outline" className="ml-1 px-1.5 py-0 text-[10px]">
+                              {a.deadlineSource === "explicit" ? "From notes" : "AI suggested"}
+                            </Badge>
+                          )}
+                        </span>
+                      </div>
+                      {a.rationale && <p className="mt-1 text-xs text-muted-foreground">{a.rationale}</p>}
                     </li>
                   ))}
                 </ul>
