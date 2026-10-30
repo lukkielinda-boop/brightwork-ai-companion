@@ -22,7 +22,9 @@ import { recordActivity } from "@/lib/activity";
 import { writingInputSchema, writingActions, writingTones, type WritingInput, type WritingOutput } from "@/lib/ai/schemas";
 import type { SavedDraft } from "@/lib/saved-drafts";
 
-const ACTION_LABELS: Record<(typeof writingActions)[number], string> = {
+type WritingAction = (typeof writingActions)[number];
+
+const ACTION_LABELS: Record<WritingAction, string> = {
   "professional-rewrite": "Rewrite professionally",
   "grammar-spelling": "Fix grammar & spelling",
   simplify: "Simplify",
