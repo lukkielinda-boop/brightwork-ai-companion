@@ -113,7 +113,7 @@ export function WritingAssistantTool() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="writing-action">Writing action</Label>
-              <Select value={action} onValueChange={setAction}>
+              <Select value={action} onValueChange={(v) => setAction(v as WritingAction)}>
                 <SelectTrigger id="writing-action" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
