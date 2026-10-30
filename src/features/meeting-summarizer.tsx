@@ -3,6 +3,7 @@ import { ClipboardList, Loader2 } from "lucide-react";
 
 import { ResponsibleAiBanner } from "@/components/responsible-ai-banner";
 import { AiErrorAlert, CopyButton, DownloadButton, LoadingPanel, RegenerateButton, ToolPage } from "@/components/tool-ui";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
